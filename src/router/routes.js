@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
+import isAuthenticated from "./auth-guard";
 
 const routes = [
   {
@@ -46,12 +47,14 @@ const routes = [
   {
     path: "/dbz",
     name: "dbz",
+    beforeEnter: [isAuthenticated],
     component: () =>
       import(/*webpackChunkName: "DbzHome"*/ "@/modules/dbz/layouts/DbzLayout"),
     children: [
       {
         path: "characters",
         name: "dbz-characters",
+        beforeEnter: [isAuthenticated],
         component: () =>
           import(
             /*webpackChunkName: "DbzCharacters"*/ "@/modules/dbz/pages/CharactersPage"
@@ -60,6 +63,7 @@ const routes = [
       {
         path: "about",
         name: "dbz-about",
+        beforeEnter: [isAuthenticated],
         component: () =>
           import(
             /*webpackChunkName: "AboutDbz"*/ "@/modules/dbz/pages/AboutPage"
@@ -80,7 +84,38 @@ const routes = [
   },
 ];
 
-export const router = createRouter({
+const router = createRouter({
   history: createWebHashHistory(),
   routes,
 });
+
+// router.beforeEach((to, from, next) => {
+//   const rand = Math.random() * 100;
+//   if (rand > 50) {
+//     console.log("authenticated");
+//     next();
+//   } else {
+//     console.log(rand, "blocked by guard");
+//     next({ name: "pokemon-home" });
+//   }
+// });
+
+// const canAccess = () => {
+//   return new Promise((resolve) => {
+//     const rand = Math.random() * 100;
+//     if (rand > 50) {
+//       console.log("authenticated");
+//       resolve(true);
+//     } else {
+//       console.log(rand, "blocked by guard - canAccess");
+//       resolve(false);
+//     }
+//   });
+// };
+
+// router.beforeEach(async (to, from, next) => {
+//   const authorized = await canAccess();
+//   authorized ? next() : next({ name: "pokemon-home" });
+// });
+
+export { router };
